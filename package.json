@@ -1,0 +1,24 @@
+{
+  "name": "react-chess",
+  "version": "1.0.0",
+  "description": "This is a project to strengthen my react skills.",
+  "keywords": [
+    "react",
+    "chess"
+  ],
+  "homepage": "https://github.com/camgraham22/React-Chess#readme",
+  "bugs": {
+    "url": "https://github.com/camgraham22/React-Chess/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/camgraham22/React-Chess.git"
+  },
+  "license": "ISC",
+  "author": "Camryn Graham",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
