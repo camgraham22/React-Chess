@@ -1,0 +1,28 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.app-container {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  height: 100vh;  
+  background: radial-gradient(rgb(236, 244, 255),rgb(91, 92, 94));
+}
+.grid-container {
+    display: grid;
+    width: 1200px;
+    height: 1200px;
+    grid-template-columns: repeat(8, 1fr); 
+    grid-template-rows: repeat(8, 1fr);   
+    }
+
+.white {
+  background-color: rgb(187, 163, 141);
+}
+
+.black {
+  background-color: rgb(87, 65, 45);
+}
