@@ -12,12 +12,21 @@ html, body {
   background: radial-gradient(rgb(236, 244, 255),rgb(91, 92, 94));
 }
 .grid-container {
-    display: grid;
-    width: 1200px;
-    height: 1200px;
-    grid-template-columns: repeat(8, 1fr); 
-    grid-template-rows: repeat(8, 1fr);   
-    }
+  display: grid;
+  width: 1200px;
+  height: 1200px;
+  grid-template-columns: repeat(8, 1fr); 
+  grid-template-rows: repeat(8, 1fr);   
+}
+
+.grid-container > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%; 
+  height: 100%;
+}
+
 
 .white {
   background-color: rgb(187, 163, 141);
@@ -25,4 +34,9 @@ html, body {
 
 .black {
   background-color: rgb(87, 65, 45);
+}
+
+.chess-image {
+  height:150px;
+  width: auto;
 }
