@@ -13,6 +13,9 @@ html, body {
 }
 .grid-container {
   display: grid;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 1200px;
   height: 1200px;
   grid-template-columns: repeat(8, 1fr); 
@@ -27,6 +30,11 @@ html, body {
   height: 100%;
 }
 
+.chess-board-container {
+  position: relative;
+  width: 1200px;
+  height: 1200px;
+}
 
 .white {
   background-color: rgb(187, 163, 141);
@@ -36,7 +44,17 @@ html, body {
   background-color: rgb(87, 65, 45);
 }
 
+
+.valid-move {
+  z-index: 10;
+  background-color: rgba(255, 61, 61, 0.418);
+}
+
+.invalid-move {
+  background-color: rgba(0, 0, 0, 0);
+}
+
 .chess-image {
-  height:150px;
+  height:140px;
   width: auto;
 }

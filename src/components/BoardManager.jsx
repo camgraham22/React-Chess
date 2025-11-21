@@ -7,7 +7,7 @@ export default function BoardManager({ boardState, updateBoardState }) {
     const [value, setValue] = useState();
 
 
-    function updateCell(row, column, value) {
+    function makeMove(row, column, value) {
         console.log("Old State: " + boardState)
         let newBoardState = boardState.slice();
         newBoardState[row] = boardState[row].slice();
@@ -33,7 +33,7 @@ export default function BoardManager({ boardState, updateBoardState }) {
             onChange={(e) => setValue(e.target.value)}
             placeholder="Value"
             />
-            <button onClick={() => updateCell(row, column, value)}>Update</button>
+            <button onClick={() => makeMove(row, column, value)}>Update</button>
         </div>
     )
 }

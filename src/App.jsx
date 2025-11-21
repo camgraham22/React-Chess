@@ -21,9 +21,8 @@ function App() {
 
   return (
     <div className="app-container">
-          <ChessBoard boardState={boardState}/>
+          <ChessBoard boardState={boardState} updateBoardState={updateBoardState} />
           {/* <Pawn updateBoard={updateBoardState} boardState={boardState}/> */}
-          <BoardManager boardState={boardState} updateBoardState={updateBoardState} />
     </div>
   )
 }
