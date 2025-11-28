@@ -2,7 +2,6 @@ import { useState } from 'react'
 import './App.css'
 import ChessBoard from './components/board.jsx'
 // import Pawn from './components/chess-pieces/pawn.jsx'
-import BoardManager from './components/BoardManager.jsx'
 
 function App() {
 
@@ -19,10 +18,13 @@ function App() {
   }
   const [ boardState, updateBoardState] = useState(initialBoard);
 
+  function resetBoard() {
+    updateBoardState(initialBoard);
+  }
+
   return (
     <div className="app-container">
-          <ChessBoard boardState={boardState} updateBoardState={updateBoardState} />
-          {/* <Pawn updateBoard={updateBoardState} boardState={boardState}/> */}
+          <ChessBoard boardState={boardState} updateBoardState={updateBoardState} resetBoard={resetBoard} />
     </div>
   )
 }
