@@ -2,8 +2,20 @@ import { useState, useEffect } from 'react';
 import '../App.css';
 import MoveValidator from './moveValidator';
 import { getValidMoves } from './moveValidator';
+import getAIMove from './recursionAIMove';
+import getBoardScore from './boardScore';
 
 export default function ChessBoard({boardState, updateBoardState, resetBoard}) {
+
+    const HUMAN = 1;
+    const AI = -1;
+    const rows = 8;
+    const columns = 8;
+    const cells = [];
+    const WHITE = 1;
+    const BLACK = -1;
+    const WHITE_KING = 6;
+    const BLACK_KING = -6;
 
     const [ currentRow, setCurrentRow ] = useState(-1);
     const [ currentColumn, setCurrentColumn ] = useState(-1);
@@ -13,6 +25,22 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard}) {
     const [ blackCheckmate, setBlackCheckmate ] = useState(false);
     const [ whiteKingPos, setWhiteKingPos ] = useState([7,4]);
     const [ blackKingPos, setBlackKingPos ] = useState([0,4]);
+    const [ turn, setTurn ] = useState(HUMAN);
+
+   useEffect(() => {
+    if (turn != AI) { return; }
+        const { move } = getAIMove(boardState, 4, AI, -Infinity, Infinity);
+        console.log(getBoardScore(move));
+        updateBoardState(move);
+        setTurn(HUMAN);
+        for (let row = 0; row < rows; row++) {
+            for (let column = 0; column < columns; column++) {
+                const pieceValue = boardState[row][column];
+                if (pieceValue === WHITE_KING) { setWhiteKingPos([row, column]); }
+                if (pieceValue === BLACK_KING) { setBlackKingPos([row, column]); }
+            }
+        }
+    }, [turn]);
 
     const CHESS_PIECE_IMAGES = {
        "-6": {img: "black-king.png"},
@@ -28,9 +56,8 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard}) {
         "5": {img: "white-queen.png"},
         "6": {img: "white-king.png"},
     };
-    const columns = 8;
-    const rows = 8;
-    const cells = [];
+
+ 
     let lastCellBlack = false;
     let tempWhiteMoves = Array.from({ length: 8 }, () => Array(8).fill(0));
     let tempBlackMoves = Array.from({ length: 8 }, () => Array(8).fill(0));
@@ -39,7 +66,7 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard}) {
         for (let column = 0; column < columns; column++) {
             const pieceValue = boardState[row][column];
             const pieceImage = CHESS_PIECE_IMAGES[pieceValue]?.img;
-            const currentPieceColor = pieceValue > 0 ? 1 : -1;
+            const currentPieceColor = isWhite(pieceValue) ? WHITE : BLACK;
             if (isWhite(pieceValue)) {
                 getValidMoves(tempWhiteMoves, pieceValue, row, column, boardState, currentPieceColor, whiteKingPos, blackKingPos);
             }
@@ -50,6 +77,7 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard}) {
                 <button 
                     key={`${row}:${column}`} 
                     className={lastCellBlack ? "white" : "black"}
+                    disabled={turn===AI}
                     onClick={() => {setValidateMove(true), setCurrentRow(row), setCurrentColumn(column)}}>
                     {!(pieceImage === undefined) && <img src={pieceImage} className="chess-image"></img>}
                 </button>);
@@ -96,7 +124,9 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard}) {
                         setWhiteKingPos={setWhiteKingPos}
                         setBlackKingPos={setBlackKingPos}
                         whiteKingPos={whiteKingPos}
-                        blackKingPos={blackKingPos} />}
+                        blackKingPos={blackKingPos}
+                        setTurn={setTurn}
+                        turn={turn} />}
                 <div className="grid-container">{cells}</div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-import isInCheck from "./checkmateChecker";
+import isInCheck from "./checkChecker";
 
 const WHITE = 1;
 const EMPTY = 0;
@@ -21,8 +21,8 @@ export function getPawnMoves(tempMoves, currentRow, currentColumn, boardState, c
         }
     }
 
-    if (currentRow === 1 && currentPieceColor === BLACK) { 
-        if (boardState[currentRow + 2][currentColumn] === EMPTY) {
+    if (currentRow === 1 && currentPieceColor === BLACK ) { 
+        if (boardState[currentRow + 2][currentColumn] === EMPTY && boardState[currentRow + 1][currentColumn] === EMPTY) {
             let tempState = boardState.map((row) => [...row]);
             tempState[currentRow + 2][currentColumn] = PAWN_MOVE;
             tempState[currentRow][currentColumn] = EMPTY;
@@ -39,11 +39,21 @@ export function getPawnMoves(tempMoves, currentRow, currentColumn, boardState, c
             tempMoves[currentRow - PAWN_MOVE][currentColumn] = PAWN_MOVE;
         }
     }
-    if (isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE], currentPieceColor)) {
-        tempMoves[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
+    if (inBounds(currentRow - PAWN_MOVE, currentColumn - PAWN_MOVE) && isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE], currentPieceColor)) {
+        let tempState = boardState.map((row) => [...row]);
+        tempState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
+        tempState[currentRow][currentColumn] = EMPTY;
+        if (!isInCheck(tempState, kingPos, kingColor)) {
+            tempMoves[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
+        }
     }
-    if (isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE], currentPieceColor)) {
-        tempMoves[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
+    if (inBounds(currentRow - PAWN_MOVE, currentColumn + PAWN_MOVE) && isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE], currentPieceColor)) {
+        let tempState = boardState.map((row) => [...row]);
+        tempState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
+        tempState[currentRow][currentColumn] = EMPTY;
+        if (!isInCheck(tempState, kingPos, kingColor)) {
+            tempMoves[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
+        }
     }
 }
 

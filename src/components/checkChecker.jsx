@@ -8,7 +8,14 @@ export default function isInCheck(boardState, kingPos, kingColor) {
     const tempMoves = Array.from({ length: 8 }, () => Array(8).fill(0));
     const rows = 8;
     const columns = 8;
-    
+  
+    if (!Array.isArray(kingPos) || kingPos.length < 2) {
+        return false; 
+    }
+
+    if (!inBounds(kingPos[0], kingPos[1])) {
+        return false;
+    }
     const kingPosRow = kingPos[0];
     const kingColumnRow = kingPos[1];
     
@@ -60,31 +67,28 @@ function getAllValidMoves(boardState, tempMoves, row, column, currentPieceColor)
 }
 
 function getAllPawnMoves(tempMoves, currentRow, currentColumn, boardState, currentPieceColor) {
-    let PAWN_MOVE = 0;
-    currentPieceColor === WHITE ? PAWN_MOVE = 1 : PAWN_MOVE = -1;
-
+    const PAWN_MOVE = 1 * currentPieceColor;
+   
     if (currentRow === 6 && currentPieceColor === WHITE) {
-        if (boardState[currentRow - 2][currentColumn] === EMPTY) {
+        if (boardState[currentRow - 2][currentColumn] === EMPTY && boardState[currentRow - 1][currentColumn] === EMPTY) {
             tempMoves[currentRow - 2][currentColumn] = PAWN_MOVE;
         }
     }
 
-    if (currentRow === 1 && currentPieceColor === BLACK) {
-        if (boardState[currentRow + 2][currentColumn] === EMPTY) {
+    if (currentRow === 1 && currentPieceColor === BLACK ) { 
+        if (boardState[currentRow + 2][currentColumn] === EMPTY && boardState[currentRow + 1][currentColumn] === EMPTY) {
             tempMoves[currentRow + 2][currentColumn] = PAWN_MOVE;
-        }
+        }   
+    
     }
-
-    if (inBounds(currentRow, currentColumn)) {
-        if (boardState[currentRow - PAWN_MOVE][currentColumn] === EMPTY) {
-            tempMoves[currentRow - PAWN_MOVE][currentColumn] = PAWN_MOVE;
-        }
-        if (isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE], currentPieceColor)) {
-            tempMoves[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
-        }
-        if (isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE], currentPieceColor)) {
-            tempMoves[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
-        }
+    if (inBounds(currentRow - PAWN_MOVE, currentColumn) && boardState[currentRow - PAWN_MOVE][currentColumn] === EMPTY) {
+        tempMoves[currentRow - PAWN_MOVE][currentColumn] = PAWN_MOVE;
+    }
+    if (inBounds(currentRow - PAWN_MOVE, currentColumn - PAWN_MOVE) && isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE], currentPieceColor)) {
+        tempMoves[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
+    }
+    if (inBounds(currentRow - PAWN_MOVE, currentColumn + PAWN_MOVE) && isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE], currentPieceColor)) {
+        tempMoves[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
     }
 }
 

@@ -1,17 +1,20 @@
 import "../App.css"
 import { useEffect, useState } from "react";
 import { getPawnMoves, getRookMoves, getKnightMoves, getBishopMoves, getQueenMoves, getKingMoves } from "./pieceMoves";
+import getAIMove from "./recursionAIMove";
 
 const rows = 8;
 const columns = 8;
 
-export default function MoveValidator({pieceValue, currentRow, currentColumn, boardState, updateBoardState, setCannotMovePiece, setValidateMove, setWhiteKingPos, setBlackKingPos, whiteKingPos, blackKingPos}) {
+export default function MoveValidator({pieceValue, currentRow, currentColumn, boardState, updateBoardState, setCannotMovePiece, setValidateMove, setWhiteKingPos, setBlackKingPos, whiteKingPos, blackKingPos, setTurn, turn}) {
    
     const cells = [];
     const BLACK = -1;
     const EMPTY = 0;
     const WHITE = 1;
     const currentPieceColor = boardState[currentRow][currentColumn] > 0 ? 1 : -1;
+    const HUMAN = 1;
+    const AI = -1;
 
     const [ validMoves, setValidMoves ] = useState(Array.from({ length: 8 }, () => Array(8).fill(0)));
 
@@ -39,6 +42,8 @@ export default function MoveValidator({pieceValue, currentRow, currentColumn, bo
         tempState[currentRow][currentColumn] = EMPTY;
         updateBoardState(tempState);
         setValidateMove(false);
+        const nextTurn = turn === HUMAN ? AI : HUMAN
+        setTurn(nextTurn);
     }
 
 
