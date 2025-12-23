@@ -5,7 +5,7 @@ import { getValidMoves } from './moveValidator';
 import getAIMove from './recursionAIMove';
 import getBoardScore from './boardScore';
 
-export default function ChessBoard({boardState, updateBoardState, resetBoard}) {
+export default function ChessBoard({boardState, updateBoardState, resetBoard, maxDepth}) {
 
     const HUMAN = 1;
     const AI = -1;
@@ -27,20 +27,43 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard}) {
     const [ blackKingPos, setBlackKingPos ] = useState([0,4]);
     const [ turn, setTurn ] = useState(HUMAN);
 
-   useEffect(() => {
-    if (turn != AI) { return; }
-        const { move } = getAIMove(boardState, 4, AI, -Infinity, Infinity);
-        console.log(getBoardScore(move));
-        updateBoardState(move);
-        setTurn(HUMAN);
-        for (let row = 0; row < rows; row++) {
-            for (let column = 0; column < columns; column++) {
-                const pieceValue = boardState[row][column];
-                if (pieceValue === WHITE_KING) { setWhiteKingPos([row, column]); }
-                if (pieceValue === BLACK_KING) { setBlackKingPos([row, column]); }
-            }
+    const RESTING = 0;
+    const MAKING_MOVE = 1;
+    const [ AiState, setAiState ] = useState(RESTING);
+
+
+    useEffect(() => {
+        if (turn != AI) {
+            setAiState(RESTING);
+            return; 
         }
+        setAiState(MAKING_MOVE);
     }, [turn]);
+
+   useEffect(() => {
+        if (AiState === RESTING ) { return; }
+
+        async function AiMove() {
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            const moveMap = new Map();
+            let bestMove;
+            for (let depth = 1; depth <= maxDepth; depth++) {
+                ({move: bestMove} = getAIMove(boardState, depth, AI, -Infinity, Infinity, bestMove, moveMap));
+                for (let row = 0; row < rows; row++) {
+                    for (let column = 0; column < columns; column++) {
+                        const pieceValue = boardState[row][column];
+                        if (pieceValue === WHITE_KING) { setWhiteKingPos([row, column]); }
+                        if (pieceValue === BLACK_KING) { setBlackKingPos([row, column]); }
+                    }
+                }
+            }
+            updateBoardState(bestMove);
+            setTurn(HUMAN);
+            setAiState(RESTING);
+        }
+        AiMove();
+    }, [AiState]);
 
     const CHESS_PIECE_IMAGES = {
        "-6": {img: "black-king.png"},
@@ -90,16 +113,14 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard}) {
     useEffect(() => {
         const tempValidMoves = tempWhiteMoves.flat();
         const newCheckmate = tempValidMoves.every(cell => cell === 0);
-        console.log("White checkmate: " + newCheckmate);
         setWhiteCheckmate(newCheckmate);
-    }, [tempWhiteMoves]);
+    }, [JSON.stringify(tempWhiteMoves)]);
 
     useEffect(() => {
         const tempValidMoves = tempBlackMoves.flat();
         const newCheckmate = tempValidMoves.every(cell => cell === 0);
-        console.log("Black checkmate: " + newCheckmate);
         setBlackCheckmate(newCheckmate);
-    }, [tempBlackMoves]);
+    }, [JSON.stringify(tempBlackMoves)]);
 
     function isWhite(pieceValue) {
         return pieceValue > 0;
@@ -107,10 +128,12 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard}) {
     function isBlack(pieceValue) {
         return pieceValue < 0;
     }
+    
     const checkmateWinner = (blackCheckmate) ? "White" : "Black";
     const checkmateText = `\n${checkmateWinner} wins!`
     return (    
         <div>
+            {(AiState !== RESTING ) && <div className="loading">AI Thinking...!</div>}
             {(whiteCheckmate || blackCheckmate) && <div className="game-over"><div>Game over!<p>{checkmateText}</p><button className="play-again-btn" onClick={() => resetBoard()}>Play Again</button></div></div>}
             {cannotMovePiece && <div className="pop-up">This piece can't be moved.<br /> It's blocked or king would be in check!</div>}
             <div className="chess-board-container">

@@ -1,7 +1,6 @@
 import "../App.css"
 import { useEffect, useState } from "react";
 import { getPawnMoves, getRookMoves, getKnightMoves, getBishopMoves, getQueenMoves, getKingMoves } from "./pieceMoves";
-import getAIMove from "./recursionAIMove";
 
 const rows = 8;
 const columns = 8;

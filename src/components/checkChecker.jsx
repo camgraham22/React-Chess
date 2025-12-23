@@ -1,8 +1,10 @@
-import { inBounds, isFriendlyPiece, isEnemyPiece} from "./pieceMoves";
+import { inBounds, isFriendlyPiece, isEnemyPiece, isEdge } from "./pieceMoves";
 
 const WHITE = 1;
 const EMPTY = 0;
 const BLACK = -1;
+const ENEMY = -1;
+const FRIENDLY = 1;
 
 export default function isInCheck(boardState, kingPos, kingColor) {
     const tempMoves = Array.from({ length: 8 }, () => Array(8).fill(0));
@@ -21,8 +23,18 @@ export default function isInCheck(boardState, kingPos, kingColor) {
     
     for (let row = 0; row < rows; row++) {
         for (let column = 0; column < columns; column++) {
-            const currentPieceColor = boardState[row][column] > 0 ? 1 : -1;
-            getAllValidMoves(boardState, tempMoves, row, column, currentPieceColor);
+            const currentPieceColor = boardState[row][column] > 0 ? WHITE : BLACK;
+            if (isEnemyPiece(currentPieceColor, kingColor)) {
+                getAllValidMoves(boardState, tempMoves, row, column, currentPieceColor, ENEMY);
+            }
+        }
+    }
+
+    for (let row = 0; row < rows; row++) {
+        for (let column = 0; column < columns; column++) {
+            const currentPieceColor = boardState[row][column] > 0 ? WHITE : BLACK;
+            if (isFriendlyPiece(currentPieceColor, kingColor))
+            getAllValidMoves(boardState, tempMoves, row, column, currentPieceColor, FRIENDLY);
         }
     }
 
@@ -31,43 +43,44 @@ export default function isInCheck(boardState, kingPos, kingColor) {
     }
 }
 
-function getAllValidMoves(boardState, tempMoves, row, column, currentPieceColor) {
+function getAllValidMoves(boardState, tempMoves, row, column, currentPieceColor, turn) {
 
         switch (boardState[row][column]) {
             case -1:
             case 1:
-                getAllPawnMoves(tempMoves, row, column, boardState, currentPieceColor);
+                getAllPawnMoves(tempMoves, row, column, boardState, currentPieceColor, turn);
                 break;
 
             case -2:
             case 2:
-                getAllRookMoves(tempMoves, row, column, boardState, currentPieceColor);
+                getAllRookMoves(tempMoves, row, column, boardState, currentPieceColor, turn);
                 break;
 
             case -3:
             case 3:
-                getAllKnightMoves(tempMoves, row, column, boardState, currentPieceColor);
+                getAllKnightMoves(tempMoves, row, column, boardState, currentPieceColor, turn);
                 break;
             
             case -4: 
             case 4: 
-                getAllBishopMoves(tempMoves, row, column, boardState, currentPieceColor);
+                getAllBishopMoves(tempMoves, row, column, boardState, currentPieceColor, turn);
                 break;
             
             case -5:
             case 5:
-                getAllQueenMoves(tempMoves, row, column, boardState, currentPieceColor);
+                getAllQueenMoves(tempMoves, row, column, boardState, currentPieceColor, turn);
                 break;
             
             case -6: 
             case 6: 
-                getAllKingMoves(tempMoves, row, column, boardState, currentPieceColor);
+                getAllKingMoves(tempMoves, row, column, boardState, currentPieceColor, turn);
                 break;
         }
 }
 
-function getAllPawnMoves(tempMoves, currentRow, currentColumn, boardState, currentPieceColor) {
+function getAllPawnMoves(tempMoves, currentRow, currentColumn, boardState, currentPieceColor, turn) {
     const PAWN_MOVE = 1 * currentPieceColor;
+    const BECOME_QUEEN = 5 * currentPieceColor;
    
     if (currentRow === 6 && currentPieceColor === WHITE) {
         if (boardState[currentRow - 2][currentColumn] === EMPTY && boardState[currentRow - 1][currentColumn] === EMPTY) {
@@ -82,13 +95,28 @@ function getAllPawnMoves(tempMoves, currentRow, currentColumn, boardState, curre
     
     }
     if (inBounds(currentRow - PAWN_MOVE, currentColumn) && boardState[currentRow - PAWN_MOVE][currentColumn] === EMPTY) {
-        tempMoves[currentRow - PAWN_MOVE][currentColumn] = PAWN_MOVE;
+        if (isEdge(currentRow - PAWN_MOVE, currentPieceColor)) {
+            tempMoves[currentRow - PAWN_MOVE][currentColumn] = BECOME_QUEEN;
+        }
+        else {
+            tempMoves[currentRow - PAWN_MOVE][currentColumn] = PAWN_MOVE;
+        }
     }
     if (inBounds(currentRow - PAWN_MOVE, currentColumn - PAWN_MOVE) && isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE], currentPieceColor)) {
-        tempMoves[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
+        if (isEdge(currentRow - PAWN_MOVE, currentPieceColor)) {
+            tempMoves[currentRow - PAWN_MOVE][currentColumn] = BECOME_QUEEN;
+        }
+        else {
+            tempMoves[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
+        }
     }
     if (inBounds(currentRow - PAWN_MOVE, currentColumn + PAWN_MOVE) && isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE], currentPieceColor)) {
-        tempMoves[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
+        if (isEdge(currentRow - PAWN_MOVE, currentPieceColor)) {
+            tempMoves[currentRow - PAWN_MOVE][currentColumn] = BECOME_QUEEN;
+        }
+        else {
+            tempMoves[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
+        }
     }
 }
 
