@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import ChessBoard from './components/board.jsx'
-// import Pawn from './components/chess-pieces/pawn.jsx'
+import StartScreen from './components/startScreen.jsx';
 
 function App() {
 
@@ -17,6 +17,8 @@ function App() {
     }
   }
   const [ boardState, updateBoardState] = useState(initialBoard);
+  const [ showStartScreen, setShowStartScreen ] = useState(true);
+  const [ maxDepth, setMaxDepth ] = useState(2);
 
   function resetBoard() {
     updateBoardState(initialBoard);
@@ -24,7 +26,8 @@ function App() {
 
   return (
     <div className="app-container">
-          <ChessBoard boardState={boardState} updateBoardState={updateBoardState} resetBoard={resetBoard} />
+          {showStartScreen && <StartScreen setMaxDepth={setMaxDepth} setShowStartScreen={setShowStartScreen} />}
+          <ChessBoard boardState={boardState} updateBoardState={updateBoardState} resetBoard={resetBoard} maxDepth={maxDepth} />
     </div>
   )
 }

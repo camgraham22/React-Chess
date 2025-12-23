@@ -7,8 +7,10 @@ const BLACK = -1;
 
 export function getPawnMoves(tempMoves, currentRow, currentColumn, boardState, currentPieceColor, whiteKingPos, blackKingPos) {
     const PAWN_MOVE = 1 * currentPieceColor;
+    const BECOME_QUEEN = 5 * currentPieceColor;
     const kingPos = currentPieceColor === WHITE ? whiteKingPos : blackKingPos;
     const kingColor = currentPieceColor;
+    let moveToMake = PAWN_MOVE;
 
     if (currentRow === 6 && currentPieceColor === WHITE) {
         if (boardState[currentRow - 2][currentColumn] === EMPTY && boardState[currentRow - 1][currentColumn] === EMPTY) {
@@ -33,26 +35,44 @@ export function getPawnMoves(tempMoves, currentRow, currentColumn, boardState, c
 }
     if (inBounds(currentRow - PAWN_MOVE, currentColumn) && boardState[currentRow - PAWN_MOVE][currentColumn] === EMPTY) {
         let tempState = boardState.map((row) => [...row]);
-        tempState[currentRow - PAWN_MOVE][currentColumn] = PAWN_MOVE;
+        if (isEdge(currentRow - PAWN_MOVE, currentPieceColor)) {
+            tempState[currentRow - PAWN_MOVE][currentColumn] = BECOME_QUEEN;
+            moveToMake = BECOME_QUEEN;
+        }
+        else {
+            tempState[currentRow - PAWN_MOVE][currentColumn] = PAWN_MOVE;
+        }
         tempState[currentRow][currentColumn] = EMPTY;
         if (!isInCheck(tempState, kingPos, kingColor)) {
-            tempMoves[currentRow - PAWN_MOVE][currentColumn] = PAWN_MOVE;
+            tempMoves[currentRow - PAWN_MOVE][currentColumn] = moveToMake;
         }
     }
     if (inBounds(currentRow - PAWN_MOVE, currentColumn - PAWN_MOVE) && isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE], currentPieceColor)) {
         let tempState = boardState.map((row) => [...row]);
-        tempState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
+        if (isEdge(currentRow - PAWN_MOVE, currentPieceColor)) {
+            tempState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = BECOME_QUEEN;
+            moveToMake = BECOME_QUEEN;
+        }
+        else {
+            tempState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
+        }
         tempState[currentRow][currentColumn] = EMPTY;
         if (!isInCheck(tempState, kingPos, kingColor)) {
-            tempMoves[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
+            tempMoves[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = moveToMake;
         }
     }
     if (inBounds(currentRow - PAWN_MOVE, currentColumn + PAWN_MOVE) && isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE], currentPieceColor)) {
         let tempState = boardState.map((row) => [...row]);
-        tempState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
+        if (isEdge(currentRow - PAWN_MOVE, currentPieceColor)) {
+            tempState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = BECOME_QUEEN;
+            moveToMake = BECOME_QUEEN;
+        }
+        else {
+            tempState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
+        }
         tempState[currentRow][currentColumn] = EMPTY;
         if (!isInCheck(tempState, kingPos, kingColor)) {
-            tempMoves[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
+            tempMoves[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = moveToMake;
         }
     }
 }
@@ -204,7 +224,7 @@ function adjacentMoves(currentRow, currentColumn, stepVertical, stepHorizontal, 
         if (!isFriendlyPiece(boardState[tempRow][tempColumn], currentPieceColor)) {
             let tempState = boardState.map((row) => [...row]);
             tempState[tempRow][tempColumn] = KING_MOVE;
-            tempState[tempRow - stepVertical][tempColumn - stepHorizontal] = EMPTY;
+            tempState[currentRow][currentColumn] = EMPTY;
             const tempKingPos = [tempRow, tempColumn];
             if (!isInCheck(tempState, tempKingPos, kingColor)) {
                 tempMoves[tempRow][tempColumn] = KING_MOVE;
@@ -236,10 +256,14 @@ export function inBounds(row, column) {
     return ( row >= 0 && row <= 7 ) && ( column >= 0 && column <= 7 );
 }
 
+export function isEdge(row, currentPieceColor) {
+    return ( currentPieceColor === WHITE && row === 0 ) || ( currentPieceColor === BLACK && row === 7 );
+}
+
 export function isEnemyPiece(pieceValue, currentPieceColor) {
     return (currentPieceColor === WHITE && pieceValue < 0) || (currentPieceColor === BLACK && pieceValue > 0);
 }
 
 export function isFriendlyPiece(pieceValue, currentPieceColor) {
-    return(currentPieceColor === WHITE && pieceValue > 0) || (currentPieceColor === BLACK && pieceValue < 0);
+    return (currentPieceColor === WHITE && pieceValue > 0) || (currentPieceColor === BLACK && pieceValue < 0);
 }   

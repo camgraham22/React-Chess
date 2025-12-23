@@ -147,7 +147,7 @@ export default function getBoardScore(boardState) {
     const blackCheckmate = tempValidBlackMoves.every(cell => cell === 0);
     if (blackCheckmate) { blackTotal -= rewardMaterialTable.checkmate; }
 
-    return whiteTotal - blackTotal;
+    return blackTotal - whiteTotal;
 }
 
 function isWhite(pieceValue) {
