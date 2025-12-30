@@ -26,7 +26,7 @@ function App() {
 
   return (
     <div className="app-container">
-          {showStartScreen && <StartScreen setMaxDepth={setMaxDepth} setShowStartScreen={setShowStartScreen} />}
+          {showStartScreen && <StartScreen maxDepth={maxDepth} setMaxDepth={setMaxDepth} setShowStartScreen={setShowStartScreen} />}
           <ChessBoard boardState={boardState} updateBoardState={updateBoardState} resetBoard={resetBoard} maxDepth={maxDepth} />
     </div>
   )

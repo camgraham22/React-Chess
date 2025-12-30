@@ -119,13 +119,17 @@ function getPawnMoves(currentRow, currentColumn, boardState, currentPieceColor) 
         let tempState = boardState.map((row) => [...row]);
         tempState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
         tempState[currentRow][currentColumn] = EMPTY;
-        totalPawnMoves.push([tempState, NO_CAPTURE]);
+        // totalPawnMoves.push([tempState, NO_CAPTURE]);
+        totalPawnMoves.push(tempState);
+
     }
     if (inBounds(currentRow - PAWN_MOVE, currentColumn + PAWN_MOVE) && isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE], currentPieceColor)) {
         let tempState = boardState.map((row) => [...row]);
         tempState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
         tempState[currentRow][currentColumn] = EMPTY;
-        totalPawnMoves.push([tempState, NO_CAPTURE]);
+        // totalPawnMoves.push([tempState, NO_CAPTURE]);
+        totalPawnMoves.push(tempState);
+
     }
     if (currentRow === 6 && currentPieceColor === WHITE) {
         if (boardState[currentRow - 2][currentColumn] === EMPTY && boardState[currentRow - 1][currentColumn] === EMPTY) {
@@ -304,7 +308,7 @@ function adjacentMoves(currentRow, currentColumn, stepVertical, stepHorizontal, 
         if (!isFriendlyPiece(boardState[tempRow][tempColumn], currentPieceColor)) {
             let tempState = boardState.map((row) => [...row]);
             tempState[tempRow][tempColumn] = KING_MOVE;
-            tempState[tempRow - stepVertical][tempColumn - stepHorizontal] = EMPTY;
+            tempState[currentRow][currentColumn] = EMPTY;
             tempAdjacentMoves.push(tempState);
         }
     }

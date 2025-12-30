@@ -1,4 +1,8 @@
+import isInCheck from "./checkChecker";
 import { getValidMoves } from "./moveValidator";
+
+const WHITE = 1;
+const BLACK = -1;
 
 export default function getBoardScore(boardState) {
 
@@ -84,6 +88,7 @@ export default function getBoardScore(boardState) {
         knight: 300,
         rook: 500,
         queen: 900,
+        check: 10000,
         checkmate: 100000,
     }
 
@@ -137,6 +142,14 @@ export default function getBoardScore(boardState) {
                 getValidMoves(tempBlackMoves, currentPieceValue, row, column, boardState, currentPieceColor, whiteKingPos, blackKingPos);
             }
         }
+    }
+
+    if (isInCheck(boardState, whiteKingPos, WHITE)) {
+        blackTotal += rewardMaterialTable.check;
+    }
+
+    if (isInCheck(boardState, blackKingPos, BLACK)) {
+        whiteTotal += rewardMaterialTable.check;
     }
 
     const tempValidWhiteMoves = tempWhiteMoves.flat();

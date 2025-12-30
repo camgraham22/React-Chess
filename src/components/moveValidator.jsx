@@ -5,7 +5,21 @@ import { getPawnMoves, getRookMoves, getKnightMoves, getBishopMoves, getQueenMov
 const rows = 8;
 const columns = 8;
 
-export default function MoveValidator({pieceValue, currentRow, currentColumn, boardState, updateBoardState, setCannotMovePiece, setValidateMove, setWhiteKingPos, setBlackKingPos, whiteKingPos, blackKingPos, setTurn, turn}) {
+export default function MoveValidator({ 
+    pieceValue, 
+    currentRow, 
+    currentColumn, 
+    boardState, 
+    updateBoardState, 
+    setCannotMovePiece, 
+    setValidateMove, 
+    setWhiteKingPos, 
+    setBlackKingPos, 
+    whiteKingPos, 
+    blackKingPos, 
+    setTurn,
+    turn
+}) {
    
     const cells = [];
     const BLACK = -1;
@@ -41,7 +55,7 @@ export default function MoveValidator({pieceValue, currentRow, currentColumn, bo
         tempState[currentRow][currentColumn] = EMPTY;
         updateBoardState(tempState);
         setValidateMove(false);
-        const nextTurn = turn === HUMAN ? AI : HUMAN
+        const nextTurn = turn === HUMAN ? AI : HUMAN;
         setTurn(nextTurn);
     }
 

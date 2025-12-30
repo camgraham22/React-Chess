@@ -23,7 +23,7 @@ export function getPawnMoves(tempMoves, currentRow, currentColumn, boardState, c
         }
     }
 
-    if (currentRow === 1 && currentPieceColor === BLACK ) { 
+    if (currentRow === 1 && currentPieceColor === BLACK) { 
         if (boardState[currentRow + 2][currentColumn] === EMPTY && boardState[currentRow + 1][currentColumn] === EMPTY) {
             let tempState = boardState.map((row) => [...row]);
             tempState[currentRow + 2][currentColumn] = PAWN_MOVE;
@@ -215,7 +215,6 @@ function diagonalMoves(startingRow, startingColumn, stepVertical, stepHorizontal
 
 function adjacentMoves(currentRow, currentColumn, stepVertical, stepHorizontal, tempMoves, boardState, currentPieceColor, whiteKingPos, blackKingPos) {
     const KING_MOVE = 6 * currentPieceColor;
-    const kingPos = currentPieceColor === WHITE ? whiteKingPos : blackKingPos;
     const kingColor = currentPieceColor;
     const tempRow = currentRow + stepVertical;
     const tempColumn = currentColumn + stepHorizontal;
