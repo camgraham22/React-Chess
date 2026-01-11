@@ -169,14 +169,13 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard, ma
     const checkmateWinner = (blackCheckmate) ? "White" : "Black";
     const checkmateText = `\n${checkmateWinner} wins!`
     return (    
-        <div>
-
+        <>
             {(AiState !== RESTING ) && <div className="loading">AI Thinking...</div>}
             {(whiteCheckmate || blackCheckmate) && <div className="game-over"><div>Game over!<p>{checkmateText}</p><button className="play-again-btn" onClick={() => resetBoard()}>Play Again</button></div></div>}
             {cannotMovePiece && <div className="pop-up">This piece can't be moved.<br /> It's blocked or king would be in check!</div>}
 
             <div>{takenWhitePieces}</div>
-            <div className="ches}s-board-container">
+            <div className="chess-board-container">
                     {validateMove &&
                      <MoveValidator 
                         pieceValue={boardState[currentRow][currentColumn]} 
@@ -197,6 +196,6 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard, ma
                     {showPreviousMove && <PreviousMove previousMove={previousMove} />}
                 <div className="grid-container">{cells}</div>
             </div>
-        </div>
+        </>
     );
 }   
