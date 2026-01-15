@@ -5,9 +5,9 @@ export default function StartScreen({ maxDepth, setMaxDepth, setShowStartScreen 
             <div className="select-difficulty">
                 <h1>Select Difficulty</h1>
                 <>
-                    <button className={maxDepth === 2 ? "difficulty-btn selected" : "difficulty-btn"} onClick={() => setMaxDepth(2)}>Beginner</button>
-                    <button className={maxDepth === 4 ? "difficulty-btn selected" : "difficulty-btn"} onClick={() => setMaxDepth(4)}>Amatuer</button>
-                    <button className={maxDepth === 6 ? "difficulty-btn selected" : "difficulty-btn"} onClick={() => setMaxDepth(6)}>Experienced</button>
+                    <button className={maxDepth === 4 ? "difficulty-btn selected" : "difficulty-btn"} onClick={() => setMaxDepth(4)}>Beginner</button>
+                    <button className={maxDepth === 6 ? "difficulty-btn selected" : "difficulty-btn"} onClick={() => setMaxDepth(6)}>Amatuer</button>
+                    <button className={maxDepth === 8 ? "difficulty-btn selected" : "difficulty-btn"} onClick={() => setMaxDepth(8)}>Experienced</button>
                 </>
             </div>
             <button className="start-button" onClick={() => setShowStartScreen(false)}>Start</button>

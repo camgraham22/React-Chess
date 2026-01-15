@@ -11,6 +11,7 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard, ma
 
     const HUMAN = 1;
     const AI = -1;
+    const EMPTY = 0;
     const rows = 8;
     const columns = 8;
     const cells = [];
@@ -48,10 +49,11 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard, ma
    useEffect(() => {
         if (AiState === RESTING ) { return; }
 
+        console.time("move");
         async function AiMove() {
             await new Promise(resolve => setTimeout(resolve, 50));
 
-            const oldState = boardState.map((row) => [...row])
+            const oldState = boardState.map((row) => [...row]);
 
             const moveMap = new Map();
             let bestMove;
@@ -61,30 +63,29 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard, ma
                 ({move: bestMove} = getAIMove(boardState, depth, AI, -Infinity, Infinity, bestMove, moveMap, setWhiteCheckmate, setBlackCheckmate));
                 for (let row = 0; row < rows; row++) {
                     for (let column = 0; column < columns; column++) {
-                        if (oldState[row][column] !== bestMove[row][column] && depth === maxDepth) {
-                            if (moveMade === undefined) {
-                                moveMade = [row, column];
-                                continue;
-                            }
-                            else if (oldPiece === undefined) {
-                                oldPiece = [row, column];
-                            }
-                            
-                        }
                         const pieceValue = boardState[row][column];
                         if (pieceValue === WHITE_KING) { setWhiteKingPos([row, column]); }
                         if (pieceValue === BLACK_KING) { setBlackKingPos([row, column]); }
                     }
                 }
             }
-            const bestMoveScore = getBoardScore(bestMove);
+
+            console.timeEnd("move");
+
+            moveMade = [bestMove.NewPosition[0], bestMove.NewPosition[1]];
+            oldPiece = [bestMove.OldPosition[0], bestMove.OldPosition[1]];
+            const newBoardState = boardState.map(row => [...row]);
+            newBoardState[moveMade[0]][moveMade[1]] = bestMove.Piece;
+            newBoardState[oldPiece[0]][oldPiece[1]] = EMPTY;
+
+            const bestMoveScore = getBoardScore(newBoardState);
             if (bestMoveScore > 100000) {
                 setWhiteCheckmate(true);
             } 
             if (bestMoveScore < -100000) {
                 setBlackCheckmate(true);
             }
-            updateBoardState(bestMove);
+            updateBoardState(newBoardState);
             setShowPreviousMove(true);
             setPreviousMove([moveMade, oldPiece]);
             setTurn(HUMAN);
@@ -170,7 +171,7 @@ export default function ChessBoard({boardState, updateBoardState, resetBoard, ma
     const checkmateText = `\n${checkmateWinner} wins!`
     return (    
         <>
-            {(AiState !== RESTING ) && <div className="loading">AI Thinking...</div>}
+            {(AiState !== RESTING ) && <div className="loading">Thinking...</div>}
             {(whiteCheckmate || blackCheckmate) && <div className="game-over"><div>Game over!<p>{checkmateText}</p><button className="play-again-btn" onClick={() => resetBoard()}>Play Again</button></div></div>}
             {cannotMovePiece && <div className="pop-up">This piece can't be moved.<br /> It's blocked or king would be in check!</div>}
 
