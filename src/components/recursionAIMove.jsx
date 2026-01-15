@@ -8,13 +8,16 @@ const EMPTY = 0;
 const BLACK = -1;
 const NO_CAPTURE = 0;
 
-export default function getAIMove(boardState, depth, turn, alpha, beta, previousBestMove, moveMap) {
+let nodes = 0;
 
-    const boardStateKey = boardState.flat().join(',');
+export default function getAIMove(boardState, depth, turn, alpha, beta, previousBestMove, moveMap) {
+    nodes++;
+    const boardStateKey = getBoardKey(boardState);
+
     if (moveMap.has(boardStateKey)) {
         const tempValue = moveMap.get(boardStateKey);
         if (tempValue.depth >= depth) {
-                return moveMap.get(boardStateKey);
+            return moveMap.get(boardStateKey);
         }
     }
 
@@ -47,14 +50,26 @@ export default function getAIMove(boardState, depth, turn, alpha, beta, previous
         }
     }
 
-    if (previousBestMove) { everyValidMove.unshift(previousBestMove); }
+    if (previousBestMove) { 
+        everyValidMove.unshift(previousBestMove); 
+    }
 
     let bestMove = everyValidMove[0];
     const numMoves = everyValidMove.length;
     for (let move = 0; move < numMoves; move++) {
         let currentMove = everyValidMove[move];
         let nextTurn = turn === AI ? HUMAN : AI;
-        const {score: currentScore } = getAIMove(currentMove, depth - 1, nextTurn, alpha, beta, null, moveMap);
+
+        const tempSavedPiece = boardState[currentMove.NewPosition[0]][currentMove.NewPosition[1]];
+        boardState[currentMove.NewPosition[0]][currentMove.NewPosition[1]] = currentMove.Piece;
+        boardState[currentMove.OldPosition[0]][currentMove.OldPosition[1]] = EMPTY;
+
+        const {score: currentScore } = getAIMove(boardState, depth - 1, nextTurn, alpha, beta, null, moveMap);
+
+        boardState[currentMove.NewPosition[0]][currentMove.NewPosition[1]] = tempSavedPiece;
+        boardState[currentMove.OldPosition[0]][currentMove.OldPosition[1]] = currentMove.Piece;
+
+
         if (currentScore > alpha && turn === AI) { 
             alpha = currentScore;
             bestMove = currentMove;
@@ -64,11 +79,13 @@ export default function getAIMove(boardState, depth, turn, alpha, beta, previous
             bestMove = currentMove;
         }
         if (beta <= alpha) {
-            moveMap.set(boardStateKey, {score: beta, move: bestMove, depth: depth});
-            return {score: (turn === AI ? alpha : beta), move: bestMove};
+            // moveMap.set(boardStateKey, {score: beta, move: bestMove, depth: depth});
+            // return {score: (turn === AI ? alpha : beta), move: bestMove};
+            break;
         }
-    }
+    }   
     moveMap.set(boardStateKey, {score: (turn === AI ? alpha : beta), move: bestMove, depth: depth});
+    if (depth === 6) console.log(nodes);
     return {score: (turn === AI ? alpha : beta), move: bestMove};
 }
 
@@ -116,42 +133,52 @@ function getPawnMoves(currentRow, currentColumn, boardState, currentPieceColor) 
     let totalPawnMoves = [];
 
     if (inBounds(currentRow - PAWN_MOVE, currentColumn - PAWN_MOVE) && isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE], currentPieceColor)) {
-        let tempState = boardState.map((row) => [...row]);
-        tempState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
-        tempState[currentRow][currentColumn] = EMPTY;
-        // totalPawnMoves.push([tempState, NO_CAPTURE]);
-        totalPawnMoves.push(tempState);
+        // boardState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = PAWN_MOVE;
+        // boardState[currentRow][currentColumn] = EMPTY;
+        totalPawnMoves.push({NewPosition: [currentRow - PAWN_MOVE, currentColumn - PAWN_MOVE], OldPosition: [currentRow, currentColumn], Piece: PAWN_MOVE});
+        // boardState[currentRow - PAWN_MOVE][currentColumn - PAWN_MOVE] = tempSavedPiece;
+        // boardState[currentRow][currentColumn] = PAWN_MOVE;
+
 
     }
     if (inBounds(currentRow - PAWN_MOVE, currentColumn + PAWN_MOVE) && isEnemyPiece(boardState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE], currentPieceColor)) {
-        let tempState = boardState.map((row) => [...row]);
-        tempState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
-        tempState[currentRow][currentColumn] = EMPTY;
-        // totalPawnMoves.push([tempState, NO_CAPTURE]);
-        totalPawnMoves.push(tempState);
+        // const tempSavedPiece = boardState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
+        // boardState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = PAWN_MOVE;
+        // boardState[currentRow][currentColumn] = EMPTY;
+        totalPawnMoves.push({NewPosition: [currentRow - PAWN_MOVE, currentColumn - PAWN_MOVE], OldPosition: [currentRow, currentColumn], Piece: PAWN_MOVE});
+        // boardState[currentRow - PAWN_MOVE][currentColumn + PAWN_MOVE] = tempSavedPiece;
+        // boardState[currentRow][currentColumn] = PAWN_MOVE;
+
 
     }
     if (currentRow === 6 && currentPieceColor === WHITE) {
         if (boardState[currentRow - 2][currentColumn] === EMPTY && boardState[currentRow - 1][currentColumn] === EMPTY) {
-            let tempState = boardState.map((row) => [...row]);
-            tempState[currentRow - 2][currentColumn] = PAWN_MOVE;
-            tempState[currentRow][currentColumn] = EMPTY;
-            totalPawnMoves.push(tempState);
+            // const tempSavedPiece = boardState[currentRow - 2][currentColumn];
+            // boardState[currentRow - 2][currentColumn] = PAWN_MOVE;
+            // boardState[currentRow][currentColumn] = EMPTY;
+            totalPawnMoves.push({NewPosition: [currentRow - 2, currentColumn], OldPosition: [currentRow, currentColumn], Piece: PAWN_MOVE});
+            // boardState[currentRow - 2][currentColumn] = tempSavedPiece;
+            // boardState[currentRow][currentColumn] = PAWN_MOVE;
+
         }
     }
     if (currentRow === 1 && currentPieceColor === BLACK) { 
         if (boardState[currentRow + 2][currentColumn] === EMPTY && boardState[currentRow + 1][currentColumn] === EMPTY) {
-            let tempState = boardState.map((row) => [...row]);
-            tempState[currentRow + 2][currentColumn] = PAWN_MOVE;
-            tempState[currentRow][currentColumn] = EMPTY;
-            totalPawnMoves.push(tempState);
+            // const tempSavedPiece = boardState[currentRow + 2][currentColumn];
+            // boardState[currentRow + 2][currentColumn] = PAWN_MOVE;
+            // boardState[currentRow][currentColumn] = EMPTY;
+            totalPawnMoves.push({NewPosition: [currentRow + 2, currentColumn], OldPosition: [currentRow, currentColumn], Piece: PAWN_MOVE});
+            // boardState[currentRow + 2][currentColumn] = tempSavedPiece;
+            // boardState[currentRow][currentColumn] = PAWN_MOVE;
         }   
     }
     if (inBounds(currentRow - PAWN_MOVE, currentColumn) && boardState[currentRow - PAWN_MOVE][currentColumn] === EMPTY) {
-        let tempState = boardState.map((row) => [...row]);
-        tempState[currentRow - PAWN_MOVE][currentColumn] = PAWN_MOVE;
-        tempState[currentRow][currentColumn] = EMPTY;
-        totalPawnMoves.push(tempState);
+        // const tempSavedPiece = boardState[currentRow - PAWN_MOVE][currentColumn];
+        // boardState[currentRow - PAWN_MOVE][currentColumn] = PAWN_MOVE;
+        // boardState[currentRow][currentColumn] = EMPTY;
+        totalPawnMoves.push({NewPosition: [currentRow - PAWN_MOVE, currentColumn], OldPosition: [currentRow, currentColumn], Piece: PAWN_MOVE});
+        // boardState[currentRow - PAWN_MOVE][currentColumn] = tempSavedPiece;
+        // boardState[currentRow][currentColumn] = PAWN_MOVE;
     }
 
     return totalPawnMoves;
@@ -268,10 +295,10 @@ function lineMoves(startingRow, startingColumn, stepVertical, stepHorizontal, pi
 
     while (inBounds( tempCurrentRow, tempCurrentColumn )) {
         if (isFriendlyPiece(boardState[tempCurrentRow][tempCurrentColumn], currentPieceColor)) { break; }
-        let tempState = boardState.map((row) => [...row]);
-        tempState[tempCurrentRow][tempCurrentColumn] = pieceMoveValue;
-        tempState[startingRow][startingColumn] = EMPTY;
-        tempLineMoves.push(tempState);
+        // let tempState = boardState.map((row) => [...row]);
+        // tempState[tempCurrentRow][tempCurrentColumn] = pieceMoveValue;
+        // tempState[startingRow][startingColumn] = EMPTY;
+        tempLineMoves.push({NewPosition: [tempCurrentRow, tempCurrentColumn], OldPosition: [startingRow, startingColumn], Piece: pieceMoveValue});
         if (isEnemyPiece(boardState[tempCurrentRow][tempCurrentColumn], currentPieceColor)) { break; }
         tempCurrentRow += stepVertical;
         tempCurrentColumn += stepHorizontal;
@@ -286,10 +313,10 @@ function diagonalMoves(startingRow, startingColumn, stepVertical, stepHorizontal
 
     while (inBounds( tempCurrentRow, tempCurrentColumn )) {
         if (isFriendlyPiece(boardState[tempCurrentRow][tempCurrentColumn], currentPieceColor)) { break; }
-        let tempState = boardState.map((row) => [...row]);
-        tempState[tempCurrentRow][tempCurrentColumn] = pieceMoveValue;
-        tempState[startingRow][startingColumn] = EMPTY;
-        tempDiagonalMoves.push(tempState);
+        // let tempState = boardState.map((row) => [...row]);
+        // tempState[tempCurrentRow][tempCurrentColumn] = pieceMoveValue;
+        // tempState[startingRow][startingColumn] = EMPTY;
+        tempDiagonalMoves.push({NewPosition: [tempCurrentRow, tempCurrentColumn], OldPosition: [startingRow, startingColumn], Piece: pieceMoveValue});
         if (isEnemyPiece(boardState[tempCurrentRow][tempCurrentColumn], currentPieceColor)) { break; }
         tempCurrentRow += stepVertical;
         tempCurrentColumn += stepHorizontal;
@@ -306,10 +333,10 @@ function adjacentMoves(currentRow, currentColumn, stepVertical, stepHorizontal, 
 
     if (inBounds( tempRow, tempColumn )) {
         if (!isFriendlyPiece(boardState[tempRow][tempColumn], currentPieceColor)) {
-            let tempState = boardState.map((row) => [...row]);
-            tempState[tempRow][tempColumn] = KING_MOVE;
-            tempState[currentRow][currentColumn] = EMPTY;
-            tempAdjacentMoves.push(tempState);
+            // let tempState = boardState.map((row) => [...row]);
+            // tempState[tempRow][tempColumn] = KING_MOVE;
+            // tempState[currentRow][currentColumn] = EMPTY;
+            tempAdjacentMoves.push({NewPosition: [tempRow, tempColumn], OldPosition: [currentRow, currentColumn], Piece: KING_MOVE});
         }
     }
     
@@ -324,10 +351,10 @@ function knightMoves(currentRow, currentColumn, stepVertical, stepHorizontal, bo
 
     if (inBounds( tempRow, tempColumn )) {
         if (!isFriendlyPiece(boardState[tempRow][tempColumn], currentPieceColor)) {
-            let tempState = boardState.map((row) => [...row]);
-            tempState[tempRow][tempColumn] = KNIGHT_MOVE;
-            tempState[tempRow - stepVertical][tempColumn - stepHorizontal] = EMPTY;
-            tempKnightMoves.push(tempState);
+            // let tempState = boardState.map((row) => [...row]);
+            // tempState[tempRow][tempColumn] = KNIGHT_MOVE;
+            // tempState[tempRow - stepVertical][tempColumn - stepHorizontal] = EMPTY;
+            tempKnightMoves.push({NewPosition: [tempRow, tempColumn], OldPosition: [currentRow, currentColumn], Piece: KNIGHT_MOVE});
         }
     }
     return tempKnightMoves;
@@ -339,4 +366,14 @@ function isWhite(pieceValue) {
 
 function isBlack(pieceValue) {
     return pieceValue < 0;
+}
+
+function getBoardKey(boardState) {
+    let boardKey = "";
+    for (let row = 0; row < 8; row++) {
+        for (let column = 0; column < 8; column++) {
+            boardKey += boardState[row][column];
+        }
+    }
+    return boardKey;
 }
