@@ -7,7 +7,16 @@ function App() {
 
 
   const initialBoard = Array.from({ length: 8 }, () => Array(8).fill("0"));
-  const initialBoardValues = [-2,-3,-4,-5,-6,-4,-3,-2,-1,-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,2,3,4,5,6,4,3,2];
+  const initialBoardValues = [
+    -2,-3,-4,-5,-6,-4,-3,-2,
+    -1,-1,-1,-1,-1,-1,-1,-1,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    1,1,1,1,1,1,1,1,
+    2,3,4,5,6,4,3,2
+  ];
   const columns = 8;
   const rows = 8;
 
@@ -22,6 +31,7 @@ function App() {
 
   function resetBoard() {
     updateBoardState(initialBoard);
+    setShowStartScreen(true);
   }
 
   return (

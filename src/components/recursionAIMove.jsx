@@ -1,4 +1,5 @@
 import getBoardScore from "./boardScore";
+import isInCheck from "./checkChecker";
 import { inBounds, isEnemyPiece, isFriendlyPiece } from "./pieceMoves";
 
 const AI = -1;
@@ -8,10 +9,8 @@ const EMPTY = 0;
 const BLACK = -1;
 const NO_CAPTURE = 0;
 
-let nodes = 0;
 
 export default function getAIMove(boardState, depth, turn, alpha, beta, previousBestMove, moveMap) {
-    nodes++;
     const boardStateKey = getBoardKey(boardState);
 
     if (moveMap.has(boardStateKey)) {
@@ -56,6 +55,12 @@ export default function getAIMove(boardState, depth, turn, alpha, beta, previous
 
     let bestMove = everyValidMove[0];
     const numMoves = everyValidMove.length;
+
+    if (numMoves === 0) {
+        const checkmateScore = turn === AI ? 100000 : -100000;
+        return {score: checkmateScore + (maxDepth - depth) * (turn * -1)};
+    }
+
     for (let move = 0; move < numMoves; move++) {
         let currentMove = everyValidMove[move];
         let nextTurn = turn === AI ? HUMAN : AI;
@@ -63,6 +68,28 @@ export default function getAIMove(boardState, depth, turn, alpha, beta, previous
         const tempSavedPiece = boardState[currentMove.NewPosition[0]][currentMove.NewPosition[1]];
         boardState[currentMove.NewPosition[0]][currentMove.NewPosition[1]] = currentMove.Piece;
         boardState[currentMove.OldPosition[0]][currentMove.OldPosition[1]] = EMPTY;
+
+        let kingPos;
+        for (let row = 0; row < rows; row++) {
+            for (let column = 0; column < columns; column++) {
+            if (turn === AI) {
+                if (boardState[row][column] === -6) {
+                    kingPos = [row, column];
+                }
+            }
+            if (turn === HUMAN) {
+                if (boardState[row][column] === 6) {
+                    kingPos = [row, column];
+                }
+            }
+        }
+    }
+
+        if (isInCheck(boardState, kingPos, turn)) {
+            boardState[currentMove.NewPosition[0]][currentMove.NewPosition[1]] = tempSavedPiece;
+            boardState[currentMove.OldPosition[0]][currentMove.OldPosition[1]] = currentMove.Piece;
+            continue;
+        }
 
         const {score: currentScore } = getAIMove(boardState, depth - 1, nextTurn, alpha, beta, null, moveMap);
 
@@ -79,13 +106,10 @@ export default function getAIMove(boardState, depth, turn, alpha, beta, previous
             bestMove = currentMove;
         }
         if (beta <= alpha) {
-            // moveMap.set(boardStateKey, {score: beta, move: bestMove, depth: depth});
-            // return {score: (turn === AI ? alpha : beta), move: bestMove};
             break;
         }
     }   
     moveMap.set(boardStateKey, {score: (turn === AI ? alpha : beta), move: bestMove, depth: depth});
-    if (depth === 6) console.log(nodes);
     return {score: (turn === AI ? alpha : beta), move: bestMove};
 }
 
